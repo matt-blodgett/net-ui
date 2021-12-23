@@ -1,0 +1,7 @@
+# Qt Creator files
+*.pro.user
+*.autosave
+
+# Builds and executables
+build/*
+build*/*
