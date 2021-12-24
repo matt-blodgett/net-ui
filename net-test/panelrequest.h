@@ -15,6 +15,7 @@ class QLineEdit;
 class QPushButton;
 class QTabWidget;
 class QLabel;
+class QTextEdit;
 QT_END_NAMESPACE
 
 
@@ -70,6 +71,12 @@ class TabBody : public QWidget
 
 public:
     explicit TabBody(QWidget *parent = nullptr);
+
+public:
+    QString data() const;
+
+private:
+    QTextEdit *m_boxData = nullptr;
 };
 
 

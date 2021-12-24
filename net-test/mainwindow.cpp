@@ -100,7 +100,7 @@ void MainWindow::initializeMenubar()
     // Testing
     QAction *actTest = new QAction(menuMain);
     actTest->setText("Test");
-    connect(actTest, &QAction::triggered, this, &MainWindow::test);
+    connect(actTest, &QAction::triggered, this, [this](){test();});
     menuMain->addAction(actTest);
 }
 
@@ -163,7 +163,16 @@ void MainWindow::slotHandleResponse(QNetworkReply *networkReply)
 
 void MainWindow::test()
 {
-    qDebug() << "test";
+//    QHash<QString, QString> headers = m_panelRequest->headers();
+//    QHash<QString, QString>::iterator i;
+//    for (headers.begin(); i != headers.end(); ++i) {
+//        qDebug() << i.key() << "=" << i.value();
+//    }
+
+
+    QByteArray data = m_panelRequest->data();
+    qDebug() << data;
+
 }
 
 

@@ -49,6 +49,9 @@ void TabKeyValues::setTitle(const QString &title)
 QHash<QString, QString> TabKeyValues::keyValueMap() const
 {
     QHash<QString, QString> kvm;
+    for (Line *line : m_lines) {
+        kvm[line->key->text()] = line->value->text();
+    }
     return kvm;
 }
 
@@ -117,17 +120,22 @@ TabBody::TabBody(QWidget *parent) : QWidget(parent)
 
     lblTitle->setText("Request Payload");
 
-    QTextEdit *boxData = new QTextEdit(this);
+    m_boxData = new QTextEdit(this);
 //    boxData->setBaseSize(10, 10);
 //    boxData->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
 //    boxData->setMaximumHeight(20);
 
     QGridLayout *gridMain = new QGridLayout(this);
     gridMain->addWidget(lblTitle, 0, 0, 1, 1);
-    gridMain->addWidget(boxData, 1, 0, 1, 1);
+    gridMain->addWidget(m_boxData, 1, 0, 1, 1);
 
     gridMain->setRowStretch(1, 0);
     setLayout(gridMain);
+}
+
+QString TabBody::data() const
+{
+    return m_boxData->document()->toPlainText();
 }
 
 
@@ -192,7 +200,7 @@ QString PanelRequest::queryString() const
 }
 QByteArray PanelRequest::data() const
 {
-    return QByteArray();
+    QByteArray data(m_tabBody->data().toStdString().c_str());
 }
 
 void PanelRequest::setMethod(const QString &method)
