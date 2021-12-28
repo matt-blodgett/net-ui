@@ -1,13 +1,10 @@
 #include "panelrequest.h"
 
-
 #include <QGridLayout>
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTabWidget>
-
-
 #include <QLabel>
 #include <QTextEdit>
 
@@ -22,12 +19,11 @@ TabKeyValues::TabKeyValues(QWidget *parent) : QWidget(parent)
     m_lblTitle = new QLabel(this);
     m_btnAddLine = new QPushButton(this);
 
-    m_lblTitle->setText("Request Headers");
     lblKey->setText("Key");
     lblValue->setText("Value");
     m_btnAddLine->setText("ADD");
 
-    connect(m_btnAddLine, &QPushButton::pressed, this, &TabKeyValues::lineAdd);
+    connect(m_btnAddLine, &QPushButton::pressed, this, [=](){addLine();});
 
     QGridLayout *gridMain = new QGridLayout(this);
     gridMain->addWidget(m_lblTitle, 0, 0, 1, 3);
@@ -39,32 +35,29 @@ TabKeyValues::TabKeyValues(QWidget *parent) : QWidget(parent)
     gridMain->setRowStretch(3, 1);
     setLayout(gridMain);
 
-    lineAdd();
+    addLine();
 }
 
 void TabKeyValues::setTitle(const QString &title)
 {
     m_lblTitle->setText(title);
 }
-QHash<QString, QString> TabKeyValues::keyValueMap() const
+void TabKeyValues::addLine(const QString &key, const QString &value)
 {
-    QHash<QString, QString> kvm;
-    for (Line *line : m_lines) {
-        kvm[line->key->text()] = line->value->text();
-    }
-    return kvm;
-}
-
-void TabKeyValues::lineAdd()
-{
-    Line *line = new Line();
+    KeyValueLine *line = new KeyValueLine();
     line->key = new QLineEdit(this);
     line->value = new QLineEdit(this);
     line->edit = new QPushButton(this);
+    if (!key.isEmpty()) {
+        line->key->setText(key);
+    }
+    if (!value.isEmpty()) {
+        line->value->setText(value);
+    }
     line->edit->setText("-");
-    m_lines.append(line);
+    m_keyValueLines.append(line);
 
-    connect(line->edit, &QPushButton::pressed, this, [=](){lineRemove(m_lines.indexOf(line));});
+    connect(line->edit, &QPushButton::pressed, this, [=](){removeLine(m_keyValueLines.indexOf(line));});
 
     QGridLayout *gridMain = static_cast<QGridLayout*>(layout());
     gridMain->removeWidget(m_btnAddLine);
@@ -79,14 +72,14 @@ void TabKeyValues::lineAdd()
     }
     gridMain->setRowStretch(gridMain->rowCount(), 1);
 }
-void TabKeyValues::lineRemove(const int &index)
+void TabKeyValues::removeLine(const int &index)
 {
-    if (index < 0 || index >= m_lines.length()) {
+    if (index < 0 || index >= m_keyValueLines.length()) {
         return;
     }
 
     QGridLayout *gridMain = static_cast<QGridLayout*>(layout());
-    Line *line = m_lines.takeAt(index);
+    KeyValueLine *line = m_keyValueLines.takeAt(index);
     gridMain->removeWidget(line->key);
     gridMain->removeWidget(line->value);
     gridMain->removeWidget(line->edit);
@@ -99,6 +92,22 @@ void TabKeyValues::lineRemove(const int &index)
         gridMain->setRowStretch(i, 0);
     }
     gridMain->setRowStretch(gridMain->rowCount(), 1);
+}
+QHash<QString, QString> TabKeyValues::keyValueMap() const
+{
+    QHash<QString, QString> keyValueMap;
+    for (KeyValueLine *line : m_keyValueLines) {
+        keyValueMap[line->key->text()] = line->value->text();
+    }
+    return keyValueMap;
+}
+
+void TabKeyValues::reset()
+{
+    int lineCount = m_keyValueLines.length();
+    for (int i = 0; i < lineCount; i++) {
+        removeLine(i);
+    }
 }
 
 
@@ -137,6 +146,10 @@ QString TabBody::data() const
 {
     return m_boxData->document()->toPlainText();
 }
+void TabBody::setData(const QString &data)
+{
+    m_boxData->setText(data);
+}
 
 
 PanelRequest::PanelRequest(QWidget *parent) : QWidget(parent)
@@ -174,8 +187,7 @@ PanelRequest::PanelRequest(QWidget *parent) : QWidget(parent)
 
 QStringList PanelRequest::methodOptions()
 {
-    QStringList methods = {"GET", "POST", "PUT", "PATCH", "DELETE"};
-    return methods;
+    return QStringList({"GET", "POST", "PUT", "PATCH", "DELETE"});
 }
 
 QString PanelRequest::method() const
@@ -186,21 +198,17 @@ QString PanelRequest::url() const
 {
     return m_boxUrl->text();
 }
+QString PanelRequest::data() const
+{
+    return m_tabBody->data();
+}
 QHash<QString, QString> PanelRequest::headers() const
 {
     return m_tabHeaders->keyValueMap();
 }
-QHash<QString, QString> PanelRequest::queryParameters() const
+QHash<QString, QString> PanelRequest::query() const
 {
     return m_tabQuery->keyValueMap();
-}
-QString PanelRequest::queryString() const
-{
-    return "";
-}
-QByteArray PanelRequest::data() const
-{
-    QByteArray data(m_tabBody->data().toStdString().c_str());
 }
 
 void PanelRequest::setMethod(const QString &method)
@@ -210,4 +218,24 @@ void PanelRequest::setMethod(const QString &method)
 void PanelRequest::setUrl(const QString &url)
 {
     m_boxUrl->setText(url);
+}
+void PanelRequest::setData(const QString &data)
+{
+    m_tabBody->setData(data);
+}
+void PanelRequest::addHeader(const QString &key, const QString &value)
+{
+    m_tabHeaders->addLine(key, value);
+}
+void PanelRequest::addQuery(const QString &key, const QString &value)
+{
+    m_tabQuery->addLine(key, value);
+}
+void PanelRequest::reset()
+{
+    setMethod("GET");
+    setUrl("");
+    setData("");
+    m_tabHeaders->reset();
+    m_tabQuery->reset();
 }
