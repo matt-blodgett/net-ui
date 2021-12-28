@@ -179,7 +179,21 @@ WorkspaceFolder *Workspace::createFolder(WorkspaceFolder *parentFolder)
 
     WorkspaceFolder *folder = new WorkspaceFolder(this);
     folder->setPid(pidGenerate(folder->type()));
-    folder->setName("New Folder");
+
+    QString name = "New Folder";
+    QString append = "";
+    int duplicates = 1;
+
+    int i = 0;
+    while(i < m_folders.size()) {
+        WorkspaceFolder *f = m_folders.at(i++);
+        if(f->name() == name + append) {
+            append = " " + QString::number(duplicates++);
+            i = 0;
+        }
+    }
+
+    folder->setName(name + append);
 
     m_folders.append(folder);
 
@@ -193,7 +207,21 @@ WorkspaceRequest *Workspace::createRequest(WorkspaceFolder *parentFolder)
 
     WorkspaceRequest *request = new WorkspaceRequest(this);
     request->setPid(pidGenerate(request->type()));
-    request->setName("New Request");
+
+    QString name = "New Request";
+    QString append = "";
+    int duplicates = 1;
+
+    int i = 0;
+    while(i < m_requests.size()) {
+        WorkspaceRequest *r = m_requests.at(i++);
+        if(r->name() == name + append) {
+            append = " " + QString::number(duplicates++);
+            i = 0;
+        }
+    }
+
+    request->setName(name + append);
 
     m_requests.append(request);
 
