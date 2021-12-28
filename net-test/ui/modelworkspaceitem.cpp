@@ -4,7 +4,6 @@
 ModelWorkspaceItem::ModelWorkspaceItem(ModelWorkspaceItem *parent)
 {
     m_parentItem = parent;
-
     if(!m_parentItem) {
         m_itemType = ModelWorkspaceItem::RootItem;
     }

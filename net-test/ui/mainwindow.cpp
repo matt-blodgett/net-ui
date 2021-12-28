@@ -182,7 +182,7 @@ void MainWindow::loadSettings()
 //    m_panelRequest->setData(data);
 }
 void MainWindow::saveSettings()
-{    
+{
     if (!QDir(pathAppData()).exists()) {
         bool created = QDir().mkpath(pathAppData());
         if (created) {

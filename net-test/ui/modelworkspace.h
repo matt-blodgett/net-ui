@@ -12,7 +12,7 @@ class QMimeData;
 QT_END_NAMESPACE
 
 
-#include "workspace.h"
+#include "core/workspace.h"
 
 
 class ModelWorkspaceItem;

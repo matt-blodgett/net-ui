@@ -8,7 +8,7 @@
 
 
 enum WorkspaceType {
-    WS_Object,
+    WS_BaseObject,
     WS_Container,
     WS_Request,
     WS_Folder,
@@ -16,24 +16,19 @@ enum WorkspaceType {
 };
 
 
-class WorkspaceObject;
+class WorkspaceBaseObject;
 class WorkspaceContainer;
 class WorkspaceRequest;
 class WorkspaceFolder;
 class Workspace;
 
 
-//typedef QVector<WorkspaceContainer*> WSContainerList;
-//typedef QVector<WorkspaceRequest*> WSRequestList;
-//typedef QVector<WorkspaceFolder*> WSFolderList;
-
-
-class WorkspaceObject : public QObject
+class WorkspaceBaseObject : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit WorkspaceObject(QObject *parent = nullptr);
+    explicit WorkspaceBaseObject(QObject *parent = nullptr);
     virtual WorkspaceType type() const;
 
 public:
@@ -49,7 +44,7 @@ private:
 };
 
 
-class WorkspaceContainer : public WorkspaceObject
+class WorkspaceContainer : public WorkspaceBaseObject
 {
     Q_OBJECT
 
@@ -96,7 +91,7 @@ public:
 };
 
 
-class Workspace : public WorkspaceObject
+class Workspace : public WorkspaceBaseObject
 {
     Q_OBJECT
 
@@ -122,8 +117,8 @@ public:
     WorkspaceFolder *getFolder(const QString &pid) const;
     WorkspaceRequest *getRequest(const QString &pid) const;
 
-    WorkspaceFolder *addFolder(WorkspaceFolder *parentFolder = nullptr);
-    WorkspaceRequest *addRequest(WorkspaceFolder *parentFolder = nullptr);
+    WorkspaceFolder *createFolder(WorkspaceFolder *parentFolder = nullptr);
+    WorkspaceRequest *createRequest(WorkspaceFolder *parentFolder = nullptr);
 
     void remove(WorkspaceFolder *folder);
     void remove(WorkspaceRequest *request);

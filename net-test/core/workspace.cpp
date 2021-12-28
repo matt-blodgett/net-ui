@@ -35,7 +35,7 @@ WorkspaceObject::WorkspaceObject(QObject *parent) : QObject(parent)
 }
 WorkspaceType WorkspaceObject::type() const
 {
-    return WS_Object;
+    return WS_BaseObject;
 }
 
 QString WorkspaceObject::pid() const
@@ -173,7 +173,7 @@ WorkspaceRequest *Workspace::getRequest(const QString &pid) const
     return nullptr;
 }
 
-WorkspaceFolder *Workspace::addFolder(WorkspaceFolder *parentFolder)
+WorkspaceFolder *Workspace::createFolder(WorkspaceFolder *parentFolder)
 {
     Q_UNUSED(parentFolder)
 
@@ -187,7 +187,7 @@ WorkspaceFolder *Workspace::addFolder(WorkspaceFolder *parentFolder)
 
     return folder;
 }
-WorkspaceRequest *Workspace::addRequest(WorkspaceFolder *parentFolder)
+WorkspaceRequest *Workspace::createRequest(WorkspaceFolder *parentFolder)
 {
     Q_UNUSED(parentFolder)
 
